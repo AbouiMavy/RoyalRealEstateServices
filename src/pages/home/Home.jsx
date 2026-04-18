@@ -1,64 +1,26 @@
 import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trees, Dog, ShieldPlus, Sparkles, Microscope, MessageCircle, ChevronDown, ChevronUp, ShoppingBag, AlertCircle } from "lucide-react";
+import {
+  Trees,
+  Dog,
+  ShieldPlus,
+  Sparkles,
+  Microscope,
+  MessageCircle,
+  ChevronDown,
+  ChevronUp,
+  ShoppingBag,
+  AlertCircle,
+  Search,
+} from "lucide-react";
 import "./Home.css";
 import { Link } from "react-router-dom";
 import Vision from "../../components/Vision";
+import LandsSection from "../Land/LandsSection";
+import PropertyGrid from "../Land/LandsSection";
 
-const SECTORS = [
-  { 
-    icon: <Trees size={32}/>, 
-    title: "Agriculture", 
-    short: "Optimisation des rendements par la régénération des sols.",
-    long: "Nous développons des engrais organiques et des biostimulants qui restaurent la biodiversité microbienne des terres épuisées, garantissant une récolte abondante sans pesticides."
-  },
-  { 
-    icon: <Dog size={32}/>, 
-    title: "Élevage", 
-    short: "Solutions nutritionnelles bio pour une croissance saine.",
-    long: "Nos additifs alimentaires naturels renforcent le système immunitaire du bétail et de la volaille, réduisant drastiquement le besoin d'antibiotiques de synthèse."
-  },
-  { 
-    icon: <ShieldPlus size={32}/>, 
-    title: "Environnement", 
-    short: "Technologies d'assainissement biologique et durable.",
-    long: "Traitement des eaux usées et des sols pollués via des micro-organismes spécifiques capables de décomposer les déchets industriels et ménagers proprement."
-  },
-  { 
-    icon: <Sparkles size={32}/>, 
-    title: "Cosmétique", 
-    short: "Transformation d'extraits naturels en soins de haute qualité.",
-    long: "Valorisation de la flore locale pour créer des huiles, beurres et sérums bio, respectant l'équilibre de la peau tout en préservant l'environnement."
-  },
-  { 
-    icon: <Microscope size={32}/>, 
-    title: "Santé", 
-    short: "Le pouvoir des principes actifs biologiques.",
-    long: "Recherche et développement de compléments alimentaires issus de la transformation biologique pour soutenir le bien-être quotidien et la vitalité naturelle."
-  }
-];
 
-const SectorCard = ({ sector }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <motion.div layout className="sector-card-expandable shadow-sm mb-4" onClick={() => setIsOpen(!isOpen)}>
-      <motion.div layout="position" className="text-success mb-3">{sector.icon}</motion.div>
-      <motion.h4 layout="position" className="fw-bold h5">{sector.title}</motion.h4>
-      <motion.p layout="position" className="text-muted small">{sector.short}</motion.p>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mt-3 pt-3 border-top">
-            <p className="small text-dark" style={{ lineHeight: '1.6' }}>{sector.long}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <button className="btn-read-more">
-        {isOpen ? "Réduire" : "Lire plus"} {isOpen ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
-      </button>
-    </motion.div>
-  );
-};
 
 export default function Home() {
   const whatsappNumber = "237657484766";
@@ -69,38 +31,28 @@ export default function Home() {
       <section className="hero-visual w-100 py-4">
         <Container>
           <motion.div
+            className="mt-5"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
             {/* LOGO DANS UN CERCLE */}
-            <motion.div
-              className="logo-container"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{
-                delay: 0.3,
-                type: "spring",
-                stiffness: 260,
-                damping: 20,
-              }}
-            >
-              <img src="/logo.jpg" alt="Okandjo Logo" className="logo-img" />
-            </motion.div>
 
-            <span className="brand-badge mb-3">Okandjo Bio Technology</span>
+            <span className="brand-badge mb-3 mt-4" style={{ color: "#FFD700" }}>
+              Royal Real Estate Services Cameroun
+            </span>
 
             <h1 className="hero-title-clean">
-              L'excellence de la <br />
-              <span>transformation biologique</span>
+              Redefining the Standard of
+              <span style={{ color: "#FFD700" }}> Premium Living</span>
             </h1>
 
             <p
               className="mx-auto mt-4"
               style={{ maxWidth: "750px", opacity: 0.9 }}
             >
-              Solutions durables pour l'agriculture, l'élevage, l'environnement,
-              la cosmétique et la santé.
+              Expert guidance in securing titled land, luxury apartments, and
+              modern homes across the most sought-after locations.
             </p>
 
             {/* DRAPEAU CENTRÉ ET RÉDUIT */}
@@ -133,53 +85,159 @@ export default function Home() {
             </div>
 
             {/* DOUBLE BOUTON */}
-            <div className="btn-group-hero">
-              <a href={`https://wa.me/${whatsappNumber}`} className="btn-main">
-                CONSULTER UN EXPERT <MessageCircle size={18} className="ms-2" />
-              </a>
-              <Link
-                to="/home/assistance"
-                className="btn-secondary-outline text-decoration-none"
-              >
-                J'AI UN PROBLÈME <AlertCircle size={18} className="ms-2" />
-              </Link>
-              <Link
-                to="/home/produits"
-                className="btn-secondary-outline text-decoration-none"
-              >
-                NOS PRODUITS <ShoppingBag size={18} className="ms-2" />
-              </Link>
+            <div
+              className="search-container-premium mt-5"
+              style={{
+                background: "#ffffff",
+                borderRadius: "100px", // Bordures très arrondies pour le côté moderne
+                padding: "10px 15px 10px 30px",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
+                maxWidth: "950px",
+                margin: "0 auto",
+                border: "1px solid rgba(212, 175, 55, 0.2)", // Bordure subtile Gold
+              }}
+            >
+              <form className="d-flex align-items-center justify-content-between">
+                {/* Section: Type de bien */}
+                <div className="search-group" style={{ flex: 1 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                      color: "#D4AF37",
+                      textTransform: "uppercase",
+                      marginBottom: "2px",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    Property
+                  </label>
+                  <select
+                    className="form-select border-0 p-0 shadow-none"
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "15px",
+                      color: "#333",
+                      background: "transparent",
+                    }}
+                  >
+                    <option value="">Any Type</option>
+                    <option value="land">Land / Plot</option>
+                    <option value="house">House / Villa</option>
+                    <option value="apartment">Apartment</option>
+                  </select>
+                </div>
+
+                <div
+                  style={{
+                    width: "1px",
+                    height: "35px",
+                    background: "#eee",
+                    margin: "0 25px",
+                  }}
+                ></div>
+
+                {/* Section: Status */}
+                <div className="search-group" style={{ flex: 1 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                      color: "#D4AF37",
+                      textTransform: "uppercase",
+                      marginBottom: "2px",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    Status
+                  </label>
+                  <select
+                    className="form-select border-0 p-0 shadow-none"
+                    style={{
+                      cursor: "pointer",
+                      fontSize: "15px",
+                      color: "#333",
+                      background: "transparent",
+                    }}
+                  >
+                    <option value="sale">For Sale</option>
+                    <option value="rent">For Rent</option>
+                  </select>
+                </div>
+
+                <div
+                  style={{
+                    width: "1px",
+                    height: "35px",
+                    background: "#eee",
+                    margin: "0 25px",
+                  }}
+                ></div>
+
+                {/* Section: Location */}
+                <div className="search-group" style={{ flex: 1.5 }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                      color: "#D4AF37",
+                      textTransform: "uppercase",
+                      marginBottom: "2px",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Where are you looking?"
+                    className="form-control border-0 p-0 shadow-none"
+                    style={{
+                      fontSize: "15px",
+                      color: "#333",
+                      background: "transparent",
+                    }}
+                  />
+                </div>
+
+                {/* Bouton de recherche circulaire Gold */}
+                <button
+                  type="submit"
+                  className="btn d-flex align-items-center justify-content-center"
+                  style={{
+                    backgroundColor: "#D4AF37",
+                    color: "#fff",
+                    width: "55px",
+                    height: "55px",
+                    borderRadius: "50%", // Bouton rond
+                    boxShadow: "0 4px 15px rgba(212, 175, 55, 0.4)",
+                    transition: "all 0.3s ease",
+                    border: "none",
+                    flexShrink: 0,
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = "#B8860B";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = "#D4AF37";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                >
+                  <Search size={22} />
+                </button>
+              </form>
             </div>
           </motion.div>
         </Container>
       </section>
 
       {/* Voilà */}
-      <Vision />
-      {/* SECTEURS D'ACTIVITÉ (Centré sur PC) */}
-      <section id="secteurs" className="py-5">
-        <Container style={{ maxWidth: "1100px" }}>
-          <div className="text-center my-5">
-            <h2 className="fw-bold">Nos Domaines d'Intervention</h2>
-            <div
-              style={{
-                width: "50px",
-                height: "3px",
-                background: "var(--light-green)",
-                margin: "15px auto",
-              }}
-            ></div>
-          </div>
-
-          <Row className="g-4">
-            {SECTORS.map((s, i) => (
-              <Col lg={6} key={i}>
-                <SectorCard sector={s} />
-              </Col>
-            ))}
-          </Row>
-        </Container>
-      </section>
+      <PropertyGrid />
+      
     </div>
   );
 }

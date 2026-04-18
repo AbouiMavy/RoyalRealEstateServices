@@ -1,84 +1,120 @@
-import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
-import "./Footer.css";
+import React from 'react';
+import { Phone, MapPin, ArrowRight, Mail } from 'lucide-react';
+import { Container } from 'react-bootstrap';
 
-export default function Footer() {
+const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="okandjo-footer">
-      <Container>
-        <Row className="gy-5">
-          {/* Section Identité */}
-          <Col lg={4} md={6}>
-            <div className="footer-logo-section">
-              <img src="/logo.jpg" alt="Okandjo Logo" className="footer-logo-circle" />
-              <h4 className="fw-bold mb-3">Okandjo <span style={{color: 'var(--light-green)'}}>Bio</span></h4>
-              <p className="small opacity-75">
-                Leader dans la transformation biologique au Cameroun. Nous innovons pour une agriculture, une santé et un environnement durables.
-              </p>
-              <div className="social-icons">
-                {/* <a href="#" className="social-link"><Facebook size={18} /></a>
-                <a href="#" className="social-link"><Linkedin size={18} /></a>
-                <a href="#" className="social-link"><Instagram size={18} /></a> */}
-              </div>
-            </div>
-          </Col>
+    <footer style={{ backgroundColor: '#020c1b', color: '#ffffff', paddingTop: '80px' }}>
+      <div className="container">
+        <Container className="row g-5">
+          
+          {/* 1. BRAND & VISION */}
+          <div className="col-lg-4 col-md-6">
+            <h3 style={{ fontWeight: '800', fontSize: '24px', marginBottom: '20px' }}>
+              ROYAL<span style={{ color: '#D4AF37' }}>ESTATE</span>
+            </h3>
+            <p style={{ color: '#94a3b8', lineHeight: '1.8', fontSize: '15px', marginBottom: '25px' }}>
+              Your premier partner for secure real estate investments in Cameroon. 
+              We specialize in titled land, premium villas, and commercial spaces.
+            </p>
+            {/* <div className="d-flex gap-3">
+              {[Facebook, Instagram, Linkedin].map((Icon, index) => (
+                <a key={index} href="#" style={{ 
+                  width: '40px', height: '40px', borderRadius: '50%', 
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)', display: 'flex', 
+                  alignItems: 'center', justifyContent: 'center', color: '#D4AF37',
+                  transition: '0.3s', border: '1px solid rgba(212, 175, 55, 0.2)'
+                }}
+                onMouseOver={(e) => {e.currentTarget.style.backgroundColor = '#D4AF37'; e.currentTarget.style.color = '#fff'}}
+                onMouseOut={(e) => {e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.1)'; e.currentTarget.style.color = '#D4AF37'}}
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div> */}
+          </div>
 
-          {/* Section Liens Rapides */}
-          <Col lg={2} md={6}>
-            <h5 className="footer-title">Navigation</h5>
-            <Link to="/" className="footer-link">Accueil</Link>
-            <Link to="/home/produits" className="footer-link">Nos Produits</Link>
-            <a href="#secteurs" className="footer-link">Expertise</a>
-            <a href="#vision" className="footer-link">Notre Vision</a>
-          </Col>
+          {/* 2. QUICK LINKS */}
+          <div className="col-lg-2 col-md-6">
+            <h5 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '25px', position: 'relative' }}>
+              Explore
+              <span style={{ position: 'absolute', bottom: '-8px', left: '0', width: '30px', height: '2px', backgroundColor: '#D4AF37' }}></span>
+            </h5>
+            <ul className="list-unstyled">
+              {['Titled Lands', 'Modern Houses', 'Apartments', 'Commercial', 'About Us'].map((item) => (
+                <li key={item} style={{ marginBottom: '12px' }}>
+                  <a href="#" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '15px', transition: '0.3s' }}
+                     onMouseOver={(e) => e.target.style.color = '#D4AF37'}
+                     onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          {/* Section Services */}
-          <Col lg={3} md={6}>
-            <h5 className="footer-title">Secteurs</h5>
-            <span className="footer-link">Agriculture Bio</span>
-            <span className="footer-link">Élevage Sain</span>
-            <span className="footer-link">Cosmétique Naturelle</span>
-            <span className="footer-link">Santé & Environnement</span>
-          </Col>
+          {/* 3. CONTACT INFO */}
+          <div className="col-lg-3 col-md-6">
+            <h5 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '25px', position: 'relative' }}>
+              Get in Touch
+              <span style={{ position: 'absolute', bottom: '-8px', left: '0', width: '30px', height: '2px', backgroundColor: '#D4AF37' }}></span>
+            </h5>
+            <div className="d-flex align-items-start gap-3 mb-3">
+              <MapPin size={20} color="#D4AF37" />
+              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>Douala - Akwa, Cameroon</p>
+            </div>
+            <div className="d-flex align-items-center gap-3 mb-3">
+              <Phone size={20} color="#D4AF37" />
+              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>+237 621 371 848</p>
+            </div>
+            <div className="d-flex align-items-center gap-3">
+              <Mail size={20} color="#D4AF37" />
+              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>contact@luxuryestate.cm</p>
+            </div>
+          </div>
 
-          {/* Section Contact */}
-          <Col lg={3} md={6}>
-            <h5 className="footer-title">Contact</h5>
-            <div className="footer-contact-item">
-              <MapPin size={18} className="text-success" />
-              <span>Yaoundé, Cameroun</span>
+          {/* 4. NEWSLETTER */}
+          <div className="col-lg-3 col-md-6">
+            <h5 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '25px', position: 'relative' }}>
+              Stay Updated
+              <span style={{ position: 'absolute', bottom: '-8px', left: '0', width: '30px', height: '2px', backgroundColor: '#D4AF37' }}></span>
+            </h5>
+            <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '20px' }}>Subscribe to get the latest property deals.</p>
+            <div className="position-relative">
+              <input type="email" placeholder="Your Email" style={{
+                width: '100%', padding: '15px', paddingRight: '50px', 
+                borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff'
+              }} />
+              <button style={{
+                position: 'absolute', right: '5px', top: '5px', bottom: '5px',
+                width: '40px', backgroundColor: '#D4AF37', border: 'none',
+                borderRadius: '8px', color: '#fff', display: 'flex', 
+                alignItems: 'center', justifyContent: 'center'
+              }}>
+                <ArrowRight size={18} />
+              </button>
             </div>
-            <div className="footer-contact-item">
-              <Phone size={18} className="text-success" />
-              <span>+237 657 484 766</span>
-            </div>
-            <div className="footer-contact-item">
-              <Mail size={18} className="text-success" />
-              <span>contact@okandjobio.com</span>
-            </div>
-            <a href="https://wa.me/237680047554" className="btn btn-outline-light btn-sm mt-3 rounded-pill px-3">
-              Support Client <ArrowUpRight size={14} />
-            </a>
-          </Col>
-        </Row>
+          </div>
+        </Container>
 
-        {/* Copyright */}
-        <div className="footer-bottom text-center">
-          <Row>
-            <Col md={12}>
-              <p className="mb-0">
-                &copy; {currentYear} Okandjo Bio Technology. Tous droits réservés. 
-                <span className="mx-2">|</span> 
-                Propulsé par Bantu Dev.
-              </p>
-            </Col>
-          </Row>
+        {/* BOTTOM BAR */}
+        <div style={{ 
+          marginTop: '80px', padding: '25px 0', borderTop: '1px solid rgba(255,255,255,0.05)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          flexWrap: 'wrap', gap: '20px', fontSize: '14px', color: '#64748b'
+        }}>
+          <p className="m-0">© {currentYear} LUXURY ESTATE. All rights reserved.</p>
+          <div className="d-flex gap-4">
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</a>
+          </div>
         </div>
-      </Container>
+      </div>
     </footer>
   );
-}
+};
+
+export default Footer;

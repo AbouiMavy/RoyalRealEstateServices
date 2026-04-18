@@ -32,9 +32,8 @@ export default function OkandjoNavbar() {
       <Container>
         {/* LOGO & NOM */}
         <Navbar.Brand href="#home" className="nav-brand-container">
-          <img src="/logo.jpg" alt="Logo" className="nav-logo" />
           <span className="nav-brand-text">
-            O<span style={{ color: "#2DB87A" }}>B</span>T.
+            <span style={{ color: "#FFD700" }}>Royal Real Estate Services</span>
           </span>
         </Navbar.Brand>
 
@@ -60,38 +59,28 @@ export default function OkandjoNavbar() {
               className="nav-link-custom"
               onClick={() => setExpanded(false)}
             >
-              Accueil
+              Home
             </Nav.Link>
 
             {/* Lien vers l'ancre Secteurs (fonctionne depuis n'importe quelle page) */}
             <Nav.Link
               as={HashLink}
               smooth
-              to="/#secteurs"
+              to="/#offers"
               className="nav-link-custom"
               onClick={() => setExpanded(false)}
             >
-              Nos Secteurs
-            </Nav.Link>
-
-            {/* Lien vers la page Produits */}
-            <Nav.Link
-              as={Link}
-              to="/home/produits"
-              className="nav-link-custom"
-              onClick={() => setExpanded(false)}
-            >
-              Produits
+              Offers
             </Nav.Link>
 
             {/* Bouton vers la page Assistance (ton bouton "Expertise" ou "Problème") */}
             <Nav.Link
               as={Link}
-              to="/home/assistance"
+              to="/home/login"
               className="btn-nav-contact"
               onClick={() => setExpanded(false)}
             >
-              Assistance <Phone size={16} className="ms-1" />
+              Connexion
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>

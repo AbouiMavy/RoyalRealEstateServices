@@ -9,7 +9,7 @@
   background: rgba(2, 12, 27, 0.9); /* Bleu Nuit Profond */
   backdrop-filter: blur(10px);
   padding: 10px 0;
-  border-bottom: 1px solid rgba(45, 184, 122, 0.2);
+  border-bottom: 1px solid #D4AF37;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -45,9 +45,9 @@
   position: relative;
 }
 
-.nav-link-custom:hover {
+/* .nav-link-custom:hover {
   color: var(--light-green) !important;
-}
+} */
 
 /* Petite barre d'accentuation au hover */
 .nav-link-custom::after {
@@ -57,7 +57,7 @@
   height: 2px;
   bottom: -5px;
   left: 0;
-  background-color: var(--light-green);
+  /* background-color: var(--light-green); */
   transition: width 0.3s;
 }
 
@@ -77,7 +77,7 @@
 
 .btn-nav-contact:hover {
   transform: translateY(-2px);
-  background: #25a069 !important;
+  background: #D4AF37 !important;
 }
 
 /* Mobile Toggler */

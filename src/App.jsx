@@ -2,9 +2,10 @@
 import UserLayout from './layouts/UserLayout'
 import Home from './pages/home/Home'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Products from './pages/Produit/Products';
-import Assistance from './pages/assistance/Assistance';
-import AdminProduits from './pagesAdmin/AdminProduits';
+// import Products from './pages/Produit/Products';
+import AdminProduits from './pagesAdmin/AdminDashboard';
+import LoginPage from './pages/login/LoginPage';
+import AdminDashboard from './pagesAdmin/AdminDashboard';
 
 function App() {
   return (
@@ -14,9 +15,9 @@ function App() {
           <Route element={<UserLayout/>}>
             <Route path="/" element={ <Home />} />
             <Route path="/acceuil" element={ <Home />} />
-            <Route path="/home/produits" element={<Products />} />
-            <Route path="/home/assistance" element={<Assistance />} />
-            <Route path="/admin-okandjo-2026" element={<AdminProduits />} />
+            {/* <Route path="/home/produits" element={<Products />} /> */}
+            <Route path="/home/login" element={<LoginPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
 
           </Route>
         </Routes>
