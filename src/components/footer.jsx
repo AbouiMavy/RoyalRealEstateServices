@@ -13,7 +13,7 @@ const Footer = () => {
           {/* 1. BRAND & VISION */}
           <div className="col-lg-4 col-md-6">
             <h3 style={{ fontWeight: '800', fontSize: '24px', marginBottom: '20px' }}>
-              ROYAL<span style={{ color: '#D4AF37' }}>ESTATE</span>
+              ROYALREAL<span style={{ color: '#D4AF37' }}>ESTATESERVICES</span>
             </h3>
             <p style={{ color: '#94a3b8', lineHeight: '1.8', fontSize: '15px', marginBottom: '25px' }}>
               Your premier partner for secure real estate investments in Cameroon. 
@@ -43,7 +43,7 @@ const Footer = () => {
               <span style={{ position: 'absolute', bottom: '-8px', left: '0', width: '30px', height: '2px', backgroundColor: '#D4AF37' }}></span>
             </h5>
             <ul className="list-unstyled">
-              {['Titled Lands', 'Modern Houses', 'Apartments', 'Commercial', 'About Us'].map((item) => (
+              {['Titled Lands', 'Modern Houses', 'Apartments', 'Commercial'].map((item) => (
                 <li key={item} style={{ marginBottom: '12px' }}>
                   <a href="#" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '15px', transition: '0.3s' }}
                      onMouseOver={(e) => e.target.style.color = '#D4AF37'}
@@ -63,15 +63,15 @@ const Footer = () => {
             </h5>
             <div className="d-flex align-items-start gap-3 mb-3">
               <MapPin size={20} color="#D4AF37" />
-              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>Douala - Akwa, Cameroon</p>
+              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>Limbe, Cameroon</p>
             </div>
             <div className="d-flex align-items-center gap-3 mb-3">
               <Phone size={20} color="#D4AF37" />
-              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>+237 621 371 848</p>
+              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>+237 681 149 809</p>
             </div>
             <div className="d-flex align-items-center gap-3">
               <Mail size={20} color="#D4AF37" />
-              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>contact@luxuryestate.cm</p>
+              <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>royalrealestateservicescmr@gmail.com</p>
             </div>
           </div>
 
@@ -106,7 +106,7 @@ const Footer = () => {
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           flexWrap: 'wrap', gap: '20px', fontSize: '14px', color: '#64748b'
         }}>
-          <p className="m-0">© {currentYear} LUXURY ESTATE. All rights reserved.</p>
+          <p className="m-0">© {currentYear} ROYAL REAL ESTATE SERVICES. All rights reserved.</p>
           <div className="d-flex gap-4">
             <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
             <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</a>
