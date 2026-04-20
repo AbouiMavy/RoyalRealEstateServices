@@ -1,29 +1,29 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
+import React, { useState } from "react"; // Ajout de useState
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Trees,
-  Dog,
-  ShieldPlus,
-  Sparkles,
-  Microscope,
-  MessageCircle,
-  ChevronDown,
-  ChevronUp,
-  ShoppingBag,
-  AlertCircle,
-  Search,
-} from "lucide-react";
+import { Search } from "lucide-react";
 import "./Home.css";
 import { Link } from "react-router-dom";
-import Vision from "../../components/Vision";
-import LandsSection from "../Land/LandsSection";
 import PropertyGrid from "../Land/LandsSection";
-
-
+import HotStories from "../hot/HotStories";
 
 export default function Home() {
-  const whatsappNumber = "237657484766";
+  // 1. Initialisation des filtres de recherche
+  const [filters, setFilters] = useState({
+    type: "",
+    status: "sale",
+    location: "",
+  });
+
+  // Fonction pour gérer les changements dans les inputs/selects
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <div className="home-wrapper">
@@ -37,14 +37,16 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             {/* LOGO DANS UN CERCLE */}
-
-            <span className="brand-badge mb-3 mt-4" style={{ color: "#FFD700" }}>
+            <span
+              className="brand-badge mb-3 mt-4"
+              style={{ color: "#e0a961" }}
+            >
               Royal Real Estate Services Cameroun
             </span>
 
             <h1 className="hero-title-clean">
               Redefining the Standard of
-              <span style={{ color: "#FFD700" }}> Premium Living</span>
+              <span style={{ color: "#e0a961" }}> Premium Living</span>
             </h1>
 
             <p
@@ -56,7 +58,7 @@ export default function Home() {
             </p>
 
             {/* DRAPEAU CENTRÉ ET RÉDUIT */}
-            <div className="d-flex justify-content-center align-items-center  mb-4">
+            <div className="d-flex justify-content-center align-items-center mb-4">
               <div
                 style={{
                   width: "24px",
@@ -78,26 +80,29 @@ export default function Home() {
                     justifyContent: "center",
                   }}
                 >
-                  <div style={{ color: "#FCD116", fontSize: "6px" }}>★</div>
+                  <div style={{ color: "#e0a961", fontSize: "6px" }}>★</div>
                 </div>
-                <div style={{ flex: 1, backgroundColor: "#FCD116" }}></div>
+                <div style={{ flex: 1, backgroundColor: "#e0a961" }}></div>
               </div>
             </div>
 
-            {/* DOUBLE BOUTON */}
+            {/* BARRE DE RECHERCHE */}
             <div
               className="search-container-premium mt-5"
               style={{
                 background: "#ffffff",
-                borderRadius: "100px", // Bordures très arrondies pour le côté moderne
+                borderRadius: "100px",
                 padding: "10px 15px 10px 30px",
                 boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
                 maxWidth: "950px",
                 margin: "0 auto",
-                border: "1px solid rgba(212, 175, 55, 0.2)", // Bordure subtile Gold
+                border: "1px solid rgba(212, 175, 55, 0.2)",
               }}
             >
-              <form className="d-flex align-items-center justify-content-between">
+              <form 
+                className="d-flex align-items-center justify-content-between"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 {/* Section: Type de bien */}
                 <div className="search-group" style={{ flex: 1 }}>
                   <label
@@ -105,7 +110,7 @@ export default function Home() {
                       display: "block",
                       fontSize: "11px",
                       fontWeight: "bold",
-                      color: "#D4AF37",
+                      color: "#e0a961",
                       textTransform: "uppercase",
                       marginBottom: "2px",
                       letterSpacing: "1px",
@@ -114,6 +119,9 @@ export default function Home() {
                     Property
                   </label>
                   <select
+                    name="type"
+                    value={filters.type}
+                    onChange={handleFilterChange}
                     className="form-select border-0 p-0 shadow-none"
                     style={{
                       cursor: "pointer",
@@ -145,7 +153,7 @@ export default function Home() {
                       display: "block",
                       fontSize: "11px",
                       fontWeight: "bold",
-                      color: "#D4AF37",
+                      color: "#e0a961",
                       textTransform: "uppercase",
                       marginBottom: "2px",
                       letterSpacing: "1px",
@@ -154,6 +162,9 @@ export default function Home() {
                     Status
                   </label>
                   <select
+                    name="status"
+                    value={filters.status}
+                    onChange={handleFilterChange}
                     className="form-select border-0 p-0 shadow-none"
                     style={{
                       cursor: "pointer",
@@ -183,7 +194,7 @@ export default function Home() {
                       display: "block",
                       fontSize: "11px",
                       fontWeight: "bold",
-                      color: "#D4AF37",
+                      color: "#e0a961",
                       textTransform: "uppercase",
                       marginBottom: "2px",
                       letterSpacing: "1px",
@@ -193,6 +204,9 @@ export default function Home() {
                   </label>
                   <input
                     type="text"
+                    name="location"
+                    value={filters.location}
+                    onChange={handleFilterChange}
                     placeholder="Where are you looking?"
                     className="form-control border-0 p-0 shadow-none"
                     style={{
@@ -203,27 +217,27 @@ export default function Home() {
                   />
                 </div>
 
-                {/* Bouton de recherche circulaire Gold */}
+                {/* Bouton de recherche */}
                 <button
-                  type="submit"
+                  type="button"
                   className="btn d-flex align-items-center justify-content-center"
                   style={{
                     backgroundColor: "#D4AF37",
                     color: "#fff",
                     width: "55px",
                     height: "55px",
-                    borderRadius: "50%", // Bouton rond
-                    boxShadow: "0 4px 15px rgba(212, 175, 55, 0.4)",
+                    borderRadius: "50%",
+                    boxShadow: "0 4px 15px #e0a961",
                     transition: "all 0.3s ease",
                     border: "none",
                     flexShrink: 0,
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = "#B8860B";
+                    e.currentTarget.style.backgroundColor = "#e0a961";
                     e.currentTarget.style.transform = "scale(1.05)";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = "#D4AF37";
+                    e.currentTarget.style.backgroundColor = "#e0a961";
                     e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
@@ -231,13 +245,60 @@ export default function Home() {
                 </button>
               </form>
             </div>
+
+            {/* BOUTON SELL PROPERTY */}
+            <button
+              onClick={() => {
+                const phoneNumber = "237681149809";
+                const message = encodeURIComponent(
+                  "Hello Royal Real Estate Services Cameroon, I would like to sell a property.",
+                );
+                window.open(
+                  `https://wa.me/${phoneNumber}?text=${message}`,
+                  "_blank",
+                );
+              }}
+              className=" mt-4"
+              style={{
+                backgroundColor: "#e0a961",
+                color: "#fff",
+                width: "280px",
+                height: "55px",
+                borderRadius: "100px",
+                boxShadow: "0 10px 20px rgba(224, 169, 97, 0.2)",
+                transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                border: "1.5px solid #e0a961",
+                fontSize: "14px",
+                fontWeight: "800",
+                letterSpacing: "0.5px",
+                textTransform: "uppercase",
+                cursor: "pointer",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "#e0a961";
+                e.currentTarget.style.color = "#ffffff";
+                e.currentTarget.style.transform = "translateY(-3px) scale(1.02)";
+                e.currentTarget.style.boxShadow = "0 15px 25px rgba(224, 169, 97, 0.4)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "#f5f5f5";
+                e.currentTarget.style.color = "#e0a961";
+                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                e.currentTarget.style.boxShadow = "0 10px 20px rgba(224, 169, 97, 0.2)";
+              }}
+            >
+              SELL A PROPERTY
+            </button>
           </motion.div>
         </Container>
       </section>
 
-      {/* Voilà */}
-      <PropertyGrid />
+      {/* SECTIONS SUIVANTES */}
+      <HotStories />
       
+      {/* 2. On passe les filtres au composant qui affiche les terres/maisons */}
+      <PropertyGrid filters={filters} />
     </div>
   );
 }
+

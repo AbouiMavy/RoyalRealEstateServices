@@ -1,65 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit3, Image as ImageIcon, CheckCircle, Search, Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient'; // Vérifie le chemin vers ton client
+import React, { useState, useEffect } from "react";
+import {
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  Search,
+  Loader2,
+  X,
+  MapPin,
+  BedDouble,
+  Bath,
+} from "lucide-react";
+import { supabase } from "../lib/supabaseClient";
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('list');
+  const [activeTab, setActiveTab] = useState("list");
   const [loading, setLoading] = useState(false);
   const [properties, setProperties] = useState([]);
-  
-  // États pour le formulaire
-  const [formData, setFormData] = useState({
-    title: '', type: 'Land', price: '', location: '', description: '', area: '', status: 'Sale'
-  });
-  const [imageFile, setImageFile] = useState(null);
+  const [editingId, setEditingId] = useState(null); // Pour savoir si on modifie ou on crée
 
-  // 1. Charger les données au démarrage
+  // States for the form
+  const [formData, setFormData] = useState({
+    title: "",
+    type: "Land",
+    price: "",
+    location: "",
+    description: "",
+    area: "",
+    status: "Sale",
+    beds: 0,
+    baths: 0,
+    is_hot: false,
+  });
+  const [imageFiles, setImageFiles] = useState([]);
+
   useEffect(() => {
     fetchProperties();
   }, []);
 
   const fetchProperties = async () => {
-    const { data, error } = await supabase
-      .from('properties')
-      .select('*')
-      // .order('created_at', { ascending: false });
+    const { data, error } = await supabase.from("properties").select("*");
+    // .order("created_at", { ascending: false });
     if (!error) setProperties(data);
   };
 
-  // 2. Gérer l'upload d'image
-  const uploadImage = async (file) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const { error } = await supabase.storage
-      .from('property-images')
-      .upload(fileName, file);
-
-    if (error) throw error;
-    const { data } = supabase.storage.from('property-images').getPublicUrl(fileName);
-    return data.publicUrl;
+  const uploadAllImages = async () => {
+    const urls = [];
+    for (const file of imageFiles) {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const { error } = await supabase.storage
+        .from("property-images")
+        .upload(fileName, file);
+      if (error) throw error;
+      const { data } = supabase.storage
+        .from("property-images")
+        .getPublicUrl(fileName);
+      urls.push(data.publicUrl);
+    }
+    return urls;
   };
 
-  // 3. Soumettre le formulaire (Create)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      let imageUrl = "";
-      if (imageFile) imageUrl = await uploadImage(imageFile);
 
-      const { error } = await supabase.from('properties').insert([{
-        ...formData,
+    try {
+      let imageUrls = [];
+
+      // Si de nouvelles images sont sélectionnées, on les upload
+      if (imageFiles.length > 0) {
+        imageUrls = await uploadAllImages();
+      } else if (editingId) {
+        // Si on édite et qu'aucune nouvelle image n'est choisie, on garde les anciennes
+        const current = properties.find((p) => p.id === editingId);
+        imageUrls = current.images;
+      } else {
+        return alert("Please add at least one photo.");
+      }
+
+      const propertySpecs =
+        formData.type === "Land"
+          ? { document: "Titled" }
+          : { beds: parseInt(formData.beds), baths: parseInt(formData.baths) };
+
+      const payload = {
+        title: formData.title,
+        type: formData.type,
         price: parseInt(formData.price),
+        location: formData.location,
+        description: formData.description,
         area: parseFloat(formData.area),
-        images: imageUrl ? [imageUrl] : []
-      }]);
+        status: formData.status,
+        images: imageUrls,
+        specifications: propertySpecs,
+        is_hot: formData.is_hot,
+      };
+
+      let error;
+      if (editingId) {
+        // UPDATE
+        const { error: updateError } = await supabase
+          .from("properties")
+          .update(payload)
+          .eq("id", editingId);
+        error = updateError;
+      } else {
+        // INSERT
+        const { error: insertError } = await supabase
+          .from("properties")
+          .insert([payload]);
+        error = insertError;
+      }
 
       if (error) throw error;
-      
-      alert("Property published successfully!");
-      setFormData({ title: '', type: 'Land', price: '', location: '', description: '', area: '', status: 'Sale' });
-      setImageFile(null);
-      setActiveTab('list');
+
+      alert(editingId ? "Updated successfully!" : "Published successfully!");
+      setEditingId(null);
+      resetForm();
       fetchProperties();
     } catch (error) {
       alert(error.message);
@@ -68,112 +125,521 @@ const AdminDashboard = () => {
     }
   };
 
-  // 4. Supprimer une propriété (Delete)
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      type: "Land",
+      price: "",
+      location: "",
+      description: "",
+      area: "",
+      status: "Sale",
+      beds: 0,
+      baths: 0,
+    });
+    setImageFiles([]);
+    setActiveTab("list");
+  };
+
+  const handleEdit = (property) => {
+    setEditingId(property.id);
+    setFormData({
+      title: property.title,
+      type: property.type,
+      price: property.price,
+      location: property.location,
+      description: property.description,
+      area: property.area,
+      status: property.status,
+      beds: property.specifications?.beds || 0,
+      baths: property.specifications?.baths || 0,
+      is_hot: property.is_hot || false,
+    });
+    // On ne peut pas "pré-remplir" les fichiers Input,
+    // mais on garde les URLs actuelles si l'utilisateur ne change rien
+    setActiveTab("add");
+  };
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this property?")) {
-      const { error } = await supabase.from('properties').delete().eq('id', id);
+    if (window.confirm("Are you sure you want to delete this property?")) {
+      const { error } = await supabase.from("properties").delete().eq("id", id);
       if (!error) fetchProperties();
     }
   };
 
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + imageFiles.length > 3)
+      return alert("Maximum 3 photos allowed.");
+    setImageFiles([...imageFiles, ...files]);
+  };
+
   return (
-    <div className="min-vh-100" style={{ backgroundColor: '#131415', paddingTop:"100px" }}>
-      <div className="bg-white border-bottom py-3 sticky-top">
+    <div className="min-vh-100" style={{ backgroundColor: "#f8f9fa" }}>
+      {/* STICKY HEADER */}
+      <div
+        className=" border-bottom py-3shadow-sm"
+        style={{
+          zIndex: 1000,
+          backgroundColor: "#eddda9",
+          paddingTop: "120px",
+          paddingBottom: "25px",
+        }}
+      >
         <div className="container d-flex justify-content-between align-items-center">
-          <h2 style={{ fontWeight: '800', fontSize: '20px', margin: 0 }}>
-            Admin <span style={{ color: '#D4AF37' }}>Console</span>
-          </h2>
-          <div className="d-flex gap-2">
-            <button onClick={() => setActiveTab('list')} className="btn px-4" style={{ borderRadius: '10px', fontWeight: '600', fontSize: '14px', backgroundColor: activeTab === 'list' ? '#D4AF37' : 'transparent', color: activeTab === 'list' ? '#fff' : '#666', border: activeTab === 'list' ? 'none' : '1px solid #eee' }}>Inventory</button>
-            <button onClick={() => setActiveTab('add')} className="btn px-4" style={{ borderRadius: '10px', fontWeight: '600', fontSize: '14px', backgroundColor: activeTab === 'add' ? '#D4AF37' : 'transparent', color: activeTab === 'add' ? '#fff' : '#666', border: activeTab === 'add' ? 'none' : '1px solid #eee' }}><Plus size={18} className="me-1" /> Add Property</button>
+          <div className="d-flex gap-3">
+            <button
+              onClick={() => setActiveTab("list")}
+              className={`btn px-4 py-2 rounded-pill fw-bold fs-7 transition-all ${activeTab === "list" ? "bg-dark text-white" : "text-muted border-0"}`}
+            >
+              Inventory
+            </button>
+            <button
+              onClick={() => setActiveTab("add")}
+              className={`btn px-4 py-2 rounded-pill fw-bold fs-7 transition-all`}
+              style={
+                activeTab === "add"
+                  ? {
+                      backgroundColor: "#D4AF37",
+                      color: "white",
+                      border: "none",
+                    }
+                  : { border: "1px solid #1a1a1a", color: "#1a1a1a" }
+              }
+            >
+              <Plus size={18} className="me-1" /> New Listing
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="container py-5">
-        {activeTab === 'list' ? (
-          <div className="bg-white rounded-4 shadow-sm border overflow-hidden">
-            <div className="p-4 border-bottom d-flex justify-content-between align-items-center">
-              <h5 className="m-0 fw-bold">Manage Listings ({properties.length})</h5>
-              <div className="position-relative" style={{ width: '300px' }}>
-                <Search size={18} className="position-absolute top-50 translate-middle-y ms-3 text-muted" />
-                <input type="text" className="form-control ps-5 border-0 bg-light" placeholder="Search..." style={{ borderRadius: '10px' }} />
+      <div className="container py-4">
+        {activeTab === "list" ? (
+          <div className="row g-4">
+            <div className="col-12 mb-2 d-flex justify-content-between align-items-center">
+              <h4 className="fw-900 m-0">
+                Properties Management ({properties.length})
+              </h4>
+              <div className="input-group w-25 shadow-sm rounded-pill overflow-hidden bg-white d-none d-md-flex">
+                <span className="input-group-text bg-white border-0">
+                  <Search size={16} />
+                </span>
+                <input
+                  type="text"
+                  className="form-control border-0 p-2"
+                  placeholder="Search..."
+                />
               </div>
             </div>
-            <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="bg-light">
-                  <tr>
-                    <th className="ps-4 border-0 py-3 text-muted small">PROPERTY</th>
-                    <th className="border-0 py-3 text-muted small">TYPE</th>
-                    <th className="border-0 py-3 text-muted small">PRICE</th>
-                    <th className="border-0 py-3 text-end pe-4 text-muted small">ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {properties.map(p => (
-                    <tr key={p.id}>
-                      <td className="ps-4">
-                        <div className="d-flex align-items-center gap-3">
-                          <img src={p.images?.[0] || 'https://via.placeholder.com/45'} alt="" style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '8px' }} />
-                          <div><p className="m-0 fw-bold">{p.title}</p><small className="text-muted">{p.location}</small></div>
-                        </div>
-                      </td>
-                      <td><span className="badge bg-light text-dark border">{p.type}</span></td>
-                      <td className="fw-bold">{p.price.toLocaleString()} XAF</td>
-                      <td className="text-end pe-4">
-                        <button onClick={() => handleDelete(p.id)} className="btn btn-sm shadow-none"><Trash2 size={18} color="#dc3545" /></button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+            {properties.length === 0 && (
+              <div className="text-center py-5 text-muted">
+                No properties found in your database.
+              </div>
+            )}
+
+            {properties.map((p) => (
+              <div key={p.id} className="col-md-6 col-lg-4">
+                <div className="card border-0 shadow-sm rounded-4 overflow-hidden position-relative h-100">
+                  <div style={{ height: "200px", position: "relative" }}>
+                    {/* Conteneur de scroll horizontal pour les images */}
+                    <div
+                      className="d-flex overflow-auto h-100 snap-x"
+                      style={{
+                        scrollbarWidth: "none",
+                        msOverflowStyle: "none",
+                      }}
+                    >
+                      {p.images && p.images.length > 0 ? (
+                        p.images.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img}
+                            className="w-100 h-100 object-fit-cover flex-shrink-0"
+                            style={{ scrollSnapAlign: "start" }}
+                            alt=""
+                          />
+                        ))
+                      ) : (
+                        <img
+                          src="https://via.placeholder.com/400x200"
+                          className="w-100 h-100 object-fit-cover"
+                          alt=""
+                        />
+                      )}
+                    </div>
+
+                    {/* Indicateur de multi-images */}
+                    {p.images?.length > 1 && (
+                      <div className="position-absolute bottom-0 end-0 m-2 badge rounded-pill bg-dark opacity-75">
+                        1 / {p.images.length}
+                      </div>
+                    )}
+
+                    {/* Badges et Actions */}
+                    {p.is_hot && (
+                      <div
+                        className="position-absolute top-0 start-0 m-2 badge rounded-pill shadow-sm"
+                        style={{ backgroundColor: "#D4AF37", color: "#fff" }}
+                      >
+                        🔥 HOT
+                      </div>
+                    )}
+
+                    <div className="position-absolute top-0 end-0 p-2 d-flex gap-2">
+                      <button
+                        onClick={() => handleEdit(p)}
+                        className="btn btn-light btn-sm rounded-circle shadow border-0 p-2"
+                      >
+                        <Plus
+                          size={16}
+                          style={{ transform: "rotate(45deg)" }}
+                        />{" "}
+                        {/* Icône Edit simple */}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        className="btn btn-danger btn-sm rounded-circle shadow border-0 p-2"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="card-body p-4">
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <h6
+                        className="fw-bold m-0 text-truncate"
+                        style={{ maxWidth: "70%" }}
+                      >
+                        {p.title}
+                      </h6>
+                      <span
+                        style={{ color: "#D4AF37" }}
+                        className="fw-bold text-nowrap"
+                      >
+                        {p.price?.toLocaleString()} <small>XAF</small>
+                      </span>
+                    </div>
+                    <p className="text-muted small mb-3">
+                      <MapPin size={12} className="me-1" /> {p.location}
+                    </p>
+                    <div className="d-flex gap-3 text-muted border-top pt-3">
+                      {/* On n'affiche les lits et douches que si ce n'est pas un terrain */}
+                      {p.type !== "Land" && (
+                        <>
+                          <span className="small d-flex align-items-center gap-1">
+                            <BedDouble size={14} />{" "}
+                            {p.specifications?.beds || 0}
+                          </span>
+                          <span className="small d-flex align-items-center gap-1">
+                            <Bath size={14} /> {p.specifications?.baths || 0}
+                          </span>
+                        </>
+                      )}
+
+                      {/* Pour un terrain, on peut afficher une info spécifique si elle existe */}
+                      {p.type === "Land" && p.specifications?.document && (
+                        <span
+                          className="small text-uppercase fw-bold"
+                          style={{ fontSize: "10px", color: "#D4AF37" }}
+                        >
+                          {p.specifications.document}
+                        </span>
+                      )}
+
+                      <span className="small fw-bold ms-auto">{p.area} m²</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="row justify-content-center">
-            <div className="col-lg-8">
-              <div className="bg-white rounded-4 shadow-sm border p-5">
-                <h4 className="fw-bold mb-4">New Listing Details</h4>
+            <div className="col-lg-10">
+              <div className="bg-white rounded-4 shadow-sm border-0 p-4 p-md-5">
+                <div className="mb-5 text-center">
+                  <h3 className="fw-900 mb-2">
+                    {editingId ? "Update Listing" : "Create New Listing"}
+                  </h3>
+                  <p className="text-muted">
+                    Fill in the details to list your property on the main
+                    portal.
+                  </p>
+                </div>
+
                 <form className="row g-4" onSubmit={handleSubmit}>
-                  <div className="col-md-12">
-                    <label className="form-label fw-bold small text-muted">TITLE</label>
-                    <input type="text" required className="form-control p-3 bg-light border-0" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="Ex: Titled Land in Kribi" />
+                  <div className="col-md-8">
+                    <label className="form-label fw-bold text-dark small">
+                      PROPERTY TITLE
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="form-control form-control-lg bg-light border-0"
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
+                      placeholder="e.g. Modern Villa with Pool"
+                    />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-muted">CATEGORY</label>
-                    <select className="form-select p-3 bg-light border-0" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
-                      <option>Land</option><option>House</option><option>Apartment</option><option>Shop</option>
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold text-dark small">
+                      CATEGORY
+                    </label>
+                    <select
+                      className="form-select form-select-lg bg-light border-0 fw-bold text-muted"
+                      value={formData.type}
+                      onChange={(e) =>
+                        setFormData({ ...formData, type: e.target.value })
+                      }
+                    >
+                      <option value="Land">Land</option>
+                      <option value="House">House</option>
+                      <option value="Apartment">Apartment</option>
+                      <option value="Shop">Shop</option>
                     </select>
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-muted">PRICE (XAF)</label>
-                    <input type="number" required className="form-control p-3 bg-light border-0" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold text-dark small">
+                      PRICE (XAF)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      className="form-control form-control-lg bg-light border-0 fw-bold"
+                      style={{ color: "#D4AF37" }}
+                      value={formData.price}
+                      onChange={(e) =>
+                        setFormData({ ...formData, price: e.target.value })
+                      }
+                    />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-muted">LOCATION</label>
-                    <input type="text" required className="form-control p-3 bg-light border-0" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} placeholder="Yaoundé, Bastos" />
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold text-dark small">
+                      STATUS
+                    </label>
+                    <select
+                      className="form-select form-select-lg bg-light border-0"
+                      value={formData.status}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
+                    >
+                      <option value="Sale">For Sale</option>
+                      <option value="Rent">For Rent</option>
+                    </select>
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold small text-muted">AREA (M²)</label>
-                    <input type="number" required className="form-control p-3 bg-light border-0" value={formData.area} onChange={e => setFormData({...formData, area: e.target.value})} />
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold text-dark small">
+                      AREA (M²)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      className="form-control form-control-lg bg-light border-0"
+                      value={formData.area}
+                      onChange={(e) =>
+                        setFormData({ ...formData, area: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  {formData.type !== "Land" && (
+                    <div className="col-12 bg-light p-4 rounded-4 d-flex gap-4 border border-white">
+                      <div className="flex-grow-1">
+                        <label className="form-label fw-bold small">
+                          BEDROOMS
+                        </label>
+                        <input
+                          type="number"
+                          className="form-control border-0"
+                          value={formData.beds}
+                          onChange={(e) =>
+                            setFormData({ ...formData, beds: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="flex-grow-1">
+                        <label className="form-label fw-bold small">
+                          BATHROOMS
+                        </label>
+                        <input
+                          type="number"
+                          className="form-control border-0"
+                          value={formData.baths}
+                          onChange={(e) =>
+                            setFormData({ ...formData, baths: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="col-md-12">
+                    <label className="form-label fw-bold text-dark small">
+                      LOCATION
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="form-control form-control-lg bg-light border-0"
+                      value={formData.location}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
+                      placeholder="Yaoundé, Bastos Area"
+                    />
+                  </div>
+
+                  <div className="col-md-12">
+                    <label className="form-label fw-bold text-dark small">
+                      DESCRIPTION
+                    </label>
+                    <textarea
+                      rows="4"
+                      className="form-control bg-light border-0"
+                      value={formData.description}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          description: e.target.value,
+                        })
+                      }
+                      placeholder="Describe the property's key features..."
+                    ></textarea>
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label fw-bold text-dark small">
+                      MEDIA (MAX 3 PHOTOS)
+                    </label>
+                    <div className="d-flex gap-3 flex-wrap">
+                      {imageFiles.map((f, i) => (
+                        <div
+                          key={i}
+                          className="position-relative"
+                          style={{ width: "120px", height: "120px" }}
+                        >
+                          <img
+                            src={URL.createObjectURL(f)}
+                            className="w-100 h-100 object-fit-cover rounded-3 border"
+                            alt=""
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setImageFiles(
+                                imageFiles.filter((_, idx) => idx !== i),
+                              )
+                            }
+                            className="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle m-1 p-0 border-0"
+                            style={{ width: "22px", height: "22px" }}
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                      {imageFiles.length < 3 && (
+                        <label
+                          className="d-flex flex-column align-items-center justify-content-center bg-light border-dashed rounded-3 shadow-none"
+                          style={{
+                            width: "120px",
+                            height: "120px",
+                            border: "2px dashed #D4AF37",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <Plus color="#D4AF37" />
+                          <span className="small text-muted fw-bold">
+                            Add Photo
+                          </span>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="d-none"
+                            onChange={handleFileChange}
+                          />
+                        </label>
+                      )}
+                    </div>
                   </div>
                   <div className="col-md-12">
-                    <label className="form-label fw-bold small text-muted">DESCRIPTION</label>
-                    <textarea className="form-control p-3 bg-light border-0" rows="3" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
-                  </div>
-                  <div className="col-md-12">
-                    <label className="form-label fw-bold small text-muted">MEDIA</label>
-                    <div className="border-dashed rounded-4 p-5 text-center" style={{ border: '2px dashed #eee', backgroundColor: '#fafafa', position: 'relative' }}>
-                      <ImageIcon size={40} color="#D4AF37" className="mb-3" />
-                      <p className="m-0 text-muted">{imageFile ? imageFile.name : "Click to upload image"}</p>
-                      <input type="file" required className="position-absolute w-100 h-100 top-0 start-0 opacity-0" style={{ cursor: 'pointer' }} onChange={e => setImageFile(e.target.files[0])} />
+                    <div
+                      className="form-check form-switch p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                      style={{
+                        backgroundColor: formData.is_hot
+                          ? "#fff9e6"
+                          : "#f8f9fa",
+                        borderColor: formData.is_hot ? "#D4AF37" : "#eee",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div>
+                        <label
+                          className="form-check-label fw-bold d-block"
+                          style={{ cursor: "pointer" }}
+                        >
+                          🔥 Set as Hot Offer
+                        </label>
+                        <small className="text-muted">
+                          This property will be highlighted on the main page.
+                        </small>
+                      </div>
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        style={{
+                          width: "50px",
+                          height: "25px",
+                          cursor: "pointer",
+                        }}
+                        checked={formData.is_hot}
+                        onChange={(e) =>
+                          setFormData({ ...formData, is_hot: e.target.checked })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="col-md-12 mt-5">
-                    <button type="submit" disabled={loading} className="btn w-100 py-3" style={{ backgroundColor: '#1a1a1a', color: '#fff', borderRadius: '15px', fontWeight: '700' }}>
-                      {loading ? <Loader2 className="spinner-border spinner-border-sm" /> : "PUBLISH PROPERTY"}
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn w-100 py-3 shadow-sm"
+                      style={{
+                        backgroundColor: "#1a1a1a",
+                        color: "#fff",
+                        borderRadius: "12px",
+                        fontWeight: "800",
+                      }}
+                    >
+                      {loading ? (
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                      ) : editingId ? (
+                        "SAVE CHANGES"
+                      ) : (
+                        "CONFIRM & PUBLISH"
+                      )}
                     </button>
+                    {/* <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn w-100 py-3 shadow-sm"
+                      style={{
+                        backgroundColor: "#1a1a1a",
+                        color: "#fff",
+                        borderRadius: "12px",
+                        fontWeight: "800",
+                      }}
+                    >
+                      {loading ? (
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                      ) : (
+                        "CONFIRM & PUBLISH LISTING"
+                      )}
+                    </button> */}
                   </div>
                 </form>
               </div>

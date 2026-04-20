@@ -32,9 +32,10 @@ export default function OkandjoNavbar() {
       <Container>
         {/* LOGO & NOM */}
         <Navbar.Brand href="#home" className="nav-brand-container">
-          <span className="nav-brand-text">
+          <img src="/logo.webp" alt="" srcset="" style={{height:"70px", width:"auto"}}/>
+          {/* <span className="nav-brand-text">
             <span style={{ color: "#FFD700" }}>Royal Real Estate Services</span>
-          </span>
+          </span> */}
         </Navbar.Brand>
 
         {/* BOUTON MOBILE */}
