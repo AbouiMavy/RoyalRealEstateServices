@@ -11,7 +11,7 @@ const Footer = () => {
         <Container className="row g-5">
           
           {/* 1. BRAND & VISION */}
-          <div className="col-lg-4 col-md-6">
+          <div className="col-lg-4 col-md-6 me-4">
             <h3 style={{ fontWeight: '800', fontSize: '24px', marginBottom: '20px' }}>
               ROYALREAL<span style={{ color: '#D4AF37' }}>ESTATESERVICES</span>
             </h3>
@@ -34,7 +34,7 @@ const Footer = () => {
                 </a>
               ))}
             </div> */}
-          </div>
+          </div><br />
 
           {/* 2. QUICK LINKS */}
           <div className="col-lg-2 col-md-6">
