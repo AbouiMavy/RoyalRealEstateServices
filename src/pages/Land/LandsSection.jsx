@@ -36,31 +36,45 @@ const PropertyGrid = ({ filters }) => { // 1. Réception des filtres ici
         setLoading(false);
       }
     };
-
     fetchProperties();
   }, []);
+  console.log(properties)
 
   const toggleAccordion = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  // --- LOGIQUE DE FILTRAGE COMBINÉE ---
-  const filteredProperties = properties.filter((p) => {
-    // A. Filtre par catégorie (Boutons au-dessus de la grille)
-    const matchesCategory = activeCategory === "All" || p.type === activeCategory;
+ const filteredProperties = properties.filter((p) => {
+  // Normalisation des données de la propriété
+  const pType = p.type ? p.type.trim().toLowerCase() : "";
+  const pStatus = p.status ? p.status.trim().toLowerCase() : "";
 
-    // B. Filtre par Type de bien (Barre de recherche)
-    const matchesSearchType = !filters?.type || p.type?.toLowerCase() === filters.type.toLowerCase();
+  // A. Catégorie (Boutons)
+  const matchesCategory = 
+    activeCategory === "All" || 
+    pType === activeCategory.toLowerCase();
 
-    // C. Filtre par Status (Sale/Rent)
-    const matchesStatus = !filters?.status || p.status?.toLowerCase() === filters.status.toLowerCase();
+  // B. Type (Barre de recherche) - On vérifie si filters.type existe et n'est pas "All"
+  const filterType = filters?.type && filters.type !== "All" ? filters.type.toLowerCase() : null;
+  const matchesSearchType = !filterType || pType === filterType;
 
-    // D. Filtre par Localisation (Recherche textuelle)
-    const matchesLocation = !filters?.location || 
-      p.location?.toLowerCase().includes(filters.location.toLowerCase());
+  // C. Status (Sale/Rent)
+  const filterStatus = filters?.status && filters.status !== "All" ? filters.status.toLowerCase() : null;
+  const matchesStatus = !filterStatus || pStatus === filterStatus;
 
-    return matchesCategory && matchesSearchType && matchesStatus && matchesLocation;
-  });
+  // D. Localisation
+  const matchesLocation = !filters?.location || 
+    p.location?.toLowerCase().includes(filters.location.toLowerCase());
+
+  // Log pour déboguer si un appart ne sort pas
+  if (pType === "apartment") {
+     console.log(`Appart ${p.id}: Cat:${matchesCategory}, SearchType:${matchesSearchType}, Status:${matchesStatus}, Loc:${matchesLocation}`);
+  }
+
+  return matchesCategory && matchesSearchType && matchesStatus && matchesLocation;
+});
+
+  // console.log(filteredProperties)
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -74,13 +88,13 @@ const PropertyGrid = ({ filters }) => { // 1. Réception des filtres ici
   const handleWhatsAppClick = (item) => {
     const phoneNumber = "237681149809";
     const message = `Good morning Royal Estate Services, in need to know more concerning the following offer :
-*Titre:* ${item.title}
-*Type:* ${item.type}
-*Prix:* ${Number(item.price).toLocaleString()} XAF
-*Localisation:* ${item.location}
-*Superficie:* ${item.area} m²
-${item.beds ? `*Chambres:* ${item.beds}` : ""}
-*Lien:* ${window.location.href}`;
+    *Titre:* ${item.title}
+    *Type:* ${item.type}
+    *Prix:* ${Number(item.price).toLocaleString()} XAF
+    *Localisation:* ${item.location}
+    *Superficie:* ${item.area} m²
+    ${item.beds ? `*Chambres:* ${item.beds}` : ""}
+    *Lien:* ${window.location.href}`;
 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");

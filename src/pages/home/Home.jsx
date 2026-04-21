@@ -12,7 +12,7 @@ export default function Home() {
   // 1. Initialisation des filtres de recherche
   const [filters, setFilters] = useState({
     type: "",
-    status: "sale",
+    status: "",
     location: "",
   });
 
